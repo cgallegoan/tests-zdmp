@@ -83,8 +83,6 @@ def callback(ch, method, properties, body, datos=datos):
 channel.basic_consume(
     queue=queue_name, on_message_callback=callback, auto_ack=True)
 
-channel.start_consuming()
-
 def create_datatable(src:ColumnDataSource,
     width:int = 600,  
     height:int = 600, 
@@ -118,3 +116,5 @@ tabla = create_datatable(ColumnDataSource(datos))
 curdoc().add_root(column(Div(text="""<h1>Resultados en Streaming</h1>""", width=800), tabla, width=800))
 curdoc().title = "Aplicación ZDMP"
 curdoc().add_periodic_callback(update, 1000 * 15)
+
+channel.start_consuming()
