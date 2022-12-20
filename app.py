@@ -117,4 +117,4 @@ curdoc().add_root(column(Div(text="""<h1>Resultados en Streaming</h1>""", width=
 curdoc().title = "Aplicación ZDMP"
 curdoc().add_periodic_callback(update, 1000 * 15)
 
-channel.start_consuming()
+#channel.start_consuming()
