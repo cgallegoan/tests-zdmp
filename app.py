@@ -74,15 +74,6 @@ channel.queue_bind(
 
 print(f' [*] Waiting for logs in {ROUTING_KEY}. To exit press CTRL+C')
 
-
-def callback(ch, method, properties, body, datos=datos):
-    push(json.loads(json.loads(body)), datos)
-    #print(" [x] %r:%r (%r)" % (method.routing_key, body, properties.headers))
-    
-
-channel.basic_consume(
-    queue=queue_name, on_message_callback=callback, auto_ack=True)
-
 def create_datatable(src:ColumnDataSource,
     width:int = 600,  
     height:int = 600, 
@@ -109,12 +100,17 @@ def update():
     """
     Actualiza el DataTable con los datos nuevos
     """
-    tabla.source.data = dict(datos)
+    
+    method, properties, body = channel.basic_get(queue=queue_name, auto_ack=True)
+    
+    if body:
+        # Process the message
+        push(json.loads(json.loads(body)), datos)
+        
+        tabla.source.data = dict(datos)
 
 tabla = create_datatable(ColumnDataSource(datos))
 
 curdoc().add_root(column(Div(text="""<h1>Resultados en Streaming</h1>""", width=800), tabla, width=800))
 curdoc().title = "Aplicación ZDMP"
 curdoc().add_periodic_callback(update, 1000 * 15)
-
-#channel.start_consuming()
