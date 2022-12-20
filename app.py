@@ -7,13 +7,16 @@ from bokeh.layouts import column
 import pika
 import sys
 import ssl
+import requests
+import re;
 import json
-import configparser
+from datetime import datetime
 
+import configparser
 datos = pd.DataFrame(columns=['id', 'timestamp', 'reliability'])
 
-def push(json_data: dict, df: pd.DataFrame) -> pd.DataFrame:
-
+def push(json_data: dict, datos_hist: pd.DataFrame) -> pd.DataFrame:
+    global datos
     """
     Push data to a dataframe
     """
@@ -22,10 +25,9 @@ def push(json_data: dict, df: pd.DataFrame) -> pd.DataFrame:
     timestamp = json_data['timestamp']
     reliability = json_data['payload'][0]['value']
 
-    new_data = pd.DataFrame([index, timestamp, reliability], columns=df.columns)
+    new_data = pd.DataFrame([[index, timestamp, reliability]], columns=datos.columns)
     # concat the new data to the old data
-    datos = pd.concat([df, new_data], ignore_index=True)
-    return datos
+    datos = pd.concat([datos_hist, new_data], ignore_index=True)
 
 
 config = configparser.ConfigParser()
@@ -73,15 +75,15 @@ channel.queue_bind(
 print(f' [*] Waiting for logs in {ROUTING_KEY}. To exit press CTRL+C')
 
 
-def callback(ch, method, properties, body):
-    datos = push(json.loads(json.loads(body)), datos)
+def callback(ch, method, properties, body, datos=datos):
+    push(json.loads(json.loads(body)), datos)
     #print(" [x] %r:%r (%r)" % (method.routing_key, body, properties.headers))
+    
 
 channel.basic_consume(
     queue=queue_name, on_message_callback=callback, auto_ack=True)
 
 channel.start_consuming()
-
 
 def create_datatable(src:ColumnDataSource,
     width:int = 600,  
