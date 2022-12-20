@@ -27,9 +27,9 @@ def push(json_data: dict, datos_hist: pd.DataFrame) -> pd.DataFrame:
     """
 
     index = json_data['id']
-    timestamp = datetime.fromisoformat(json_data['timestamp']).time()
+    timestamp = datetime.strptime(json_data['timestamp'],'%Y-%m-%dT%H:%M:%S.%fZ').time()
     reliability = round(float(json_data['payload'][0]['value']),2)
-    speed_timestamp = datetime.fromisoformat(json_data['prediction_timestamp']).timestamp() - datetime.fromisoformat(json_data['timestamp']).timestamp()
+    speed_timestamp = datetime.strptime(json_data['prediction_timestamp'],'%Y-%m-%dT%H:%M:%S.%fZ').timestamp() - datetime.strptime(json_data['timestamp'],'%Y-%m-%dT%H:%M:%S.%fZ').timestamp()
     result = json_data['result']['label']
     raw_data = pd.DataFrame(json_data['raw_data'], index=[0])
     raw_data = raw_data.loc[:, raw_data.columns.isin(predictors)]
