@@ -29,9 +29,9 @@ def push(json_data: dict, datos_hist: pd.DataFrame) -> pd.DataFrame:
     """
 
     index = json_data['id']
-    timestamp = datetime.strptime(json_data['timestamp'],'%Y-%m-%dT%H:%M:%S.%fZ').time()
+    timestamp = json_data['timestamp'][:-1]
     reliability = round(float(json_data['payload'][0]['value']),2)
-    speed_timestamp = datetime.strptime(json_data['prediction_timestamp'],'%Y-%m-%dT%H:%M:%S.%fZ').timestamp() - datetime.strptime(json_data['timestamp'],'%Y-%m-%dT%H:%M:%S.%fZ').timestamp()
+    speed_timestamp = round(float(datetime.strptime(json_data['prediction_timestamp'],'%Y-%m-%dT%H:%M:%S.%fZ').timestamp() - datetime.strptime(json_data['timestamp'],'%Y-%m-%dT%H:%M:%S.%fZ').timestamp()), 2)
     result = json_data['result']['label']
     raw_data = pd.DataFrame(json_data['raw_data'], index=[0])
     raw_data = raw_data.loc[:, raw_data.columns.isin(predictors)]
@@ -113,7 +113,7 @@ def update_barshow(attrname, old, new) -> None:
         - mean_std: lista con las medias y desviaciones estándar de cada variable
     """
 
-    raw_data = raw_datas[new]
+    raw_data = raw_datas[new].iloc[0]
     #calculate the deviation of each variable
     deviations = [abs((raw_data[variable] - mean)/std) for variable, (mean, std) in mean_std]
     #Which variables have the highest deviation
@@ -123,9 +123,9 @@ def update_barshow(attrname, old, new) -> None:
     source_bar.data  = {'variable': variables, 'deviation': deviations}
 
 def create_datatable(src:ColumnDataSource,
-    width:int = 600,  
+    width:int = 400,  
     height:int = 600, 
-    widthColumns:int = 150,
+    widthColumns:int = 100,
     ) -> DataTable:
 
     """
