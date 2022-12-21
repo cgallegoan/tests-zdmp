@@ -136,16 +136,16 @@ def create_datatable(src:ColumnDataSource,
     columns.append(TableColumn(field="timestamp", title="timestamp", width=widthColumns))
     columns.append(TableColumn(field="speed", title="prediction (s)", width=widthColumns))
 
-    def row_formatter(view, attr, old, new):
-        if view.data['reliability'][new] < 0.1:
-            return 'background-color: red'
-        return 'background-color: white'
+    def row_attrs(row_index, _record):
+        if src.data['reliability'][row_index] < 0.1:
+            return {'background-color': 'red'}
+        return {'background-color': 'white'}
 
     tabla = DataTable(sortable = True, reorderable = True, 
                 autosize_mode='none', source=src,
                 columns=columns, index_position = None, 
                 width = width, height = height,
-                row_formatter=row_formatter)
+                row_attrs=row_attrs)
 
     return tabla
     
