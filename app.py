@@ -111,8 +111,13 @@ def update_barshow(attrname, old, new) -> None:
     #Which variables have the highest deviation
     variables = [(variable, deviation) for variable, deviation in sorted(zip(predictors, deviations), key=lambda x: x[1], reverse=True)][:5]
     variables, deviations = zip(*variables)
-    #creates a dataframe with the variables and their deviations
-    source_bar.data  = {'variable': variables, 'deviation': deviations}
+    #creates a columndatasoruce with the variables and their deviations
+    source = ColumnDataSource(data=dict(variable=variables, deviation=deviations))
+
+    barshow.x_range.factors = variables
+    barshow.title.text = f'Variables más relevantes de la muestra {id_mostrar.value}'
+    source_bar.data.update(source.data)
+
 
 def create_datatable(src:ColumnDataSource,
     width:int = 400,  
