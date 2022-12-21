@@ -4,7 +4,7 @@ from bokeh.plotting import figure, curdoc
 from bokeh.models import ColumnDataSource, TableColumn, DataTable, Div, FactorRange, HTMLTemplateFormatter
 from bokeh.models.widgets import AutocompleteInput
 from bokeh.layouts import column, row
-from bokeh.models import LinearAxis, CircularAxis, Range1d, FixedTicker
+from bokeh.models import LinearAxis, Range1d, FixedTicker
 
 
 import pika
@@ -123,10 +123,7 @@ def create_speedometer(value:float, min_value:float, max_value:float, ticks:list
     p.ygrid.grid_line_color = None
 
     # Add a LinearAxis for the ticks
-    p.add_layout(LinearAxis(ticker=FixedTicker(ticks=ticks)), 'below')
-
-    # Add a CircularAxis for the tick labels
-    p.add_layout(CircularAxis(ticker=FixedTicker(ticks=ticks)), 'left')
+    p.add_layout(LinearAxis(ticker=FixedTicker(ticks=ticks), location="circular"), 'below')
 
     return p
 
