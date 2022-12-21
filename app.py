@@ -129,23 +129,21 @@ def create_datatable(src:ColumnDataSource,
     """
     Crea un DataTable con los datos de la fuente de datos   
     """
+    def reliability_formatter(value):
+        if value < 0.1:
+            return f'<span style="color: red">{value}</span>'
+        return value
 
     columns = []
     columns.append(TableColumn(field="index", title="id", width=widthColumns))
-    columns.append(TableColumn(field="reliability", title="reliability", width=widthColumns))
+    columns.append(TableColumn(field="reliability", title="reliability", width=widthColumns, formatter = reliability_formatter))
     columns.append(TableColumn(field="timestamp", title="timestamp", width=widthColumns))
     columns.append(TableColumn(field="speed", title="prediction (s)", width=widthColumns))
-
-    def row_attrs(row_index, _record):
-        if src.data['reliability'][row_index] < 0.1:
-            return {'background-color': 'red'}
-        return {'background-color': 'white'}
 
     tabla = DataTable(sortable = True, reorderable = True, 
                 autosize_mode='none', source=src,
                 columns=columns, index_position = None, 
-                width = width, height = height,
-                row_attrs=row_attrs)
+                width = width, height = height)
 
     return tabla
     
