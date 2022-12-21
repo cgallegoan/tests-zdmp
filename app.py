@@ -4,6 +4,17 @@ from bokeh.plotting import figure, curdoc
 from bokeh.models import ColumnDataSource, TableColumn, DataTable, Div, FactorRange
 from bokeh.models.widgets import AutocompleteInput
 from bokeh.layouts import column, row
+from bokeh.models.widgets.tables import StringFormatter, CellFormatter
+
+class ReliabilityFormatter(CellFormatter):
+    def __init__(self, source):
+        self.source = source
+
+    def __call__(self, row_index, column_index):
+        value = self.source.data[self.columns[column_index]][row_index]
+        if self.source.data['reliability'][row_index] < 0.1:
+            return f'<div style="background-color: red">{value}</div>'
+        return value
 
 import pika
 import sys
@@ -129,16 +140,13 @@ def create_datatable(src:ColumnDataSource,
     """
     Crea un DataTable con los datos de la fuente de datos   
     """
-    def reliability_formatter(value):
-        if value < 0.1:
-            return f'<span style="color: red">{value}</span>'
-        return value
+    formatter = ReliabilityFormatter(source=src)
 
     columns = []
-    columns.append(TableColumn(field="index", title="id", width=widthColumns))
-    columns.append(TableColumn(field="reliability", title="reliability", width=widthColumns, formatter = reliability_formatter))
-    columns.append(TableColumn(field="timestamp", title="timestamp", width=widthColumns))
-    columns.append(TableColumn(field="speed", title="prediction (s)", width=widthColumns))
+    columns.append(TableColumn(field="index", title="id", width=widthColumns, formatter = formatter))
+    columns.append(TableColumn(field="reliability", title="reliability", width=widthColumns, formatter = formatter))
+    columns.append(TableColumn(field="timestamp", title="timestamp", width=widthColumns, formatter = formatter))
+    columns.append(TableColumn(field="speed", title="prediction (s)", width=widthColumns, formatter = formatter))
 
     tabla = DataTable(sortable = True, reorderable = True, 
                 autosize_mode='none', source=src,
