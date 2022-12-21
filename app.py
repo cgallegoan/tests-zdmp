@@ -111,7 +111,7 @@ def create_speedometer(value:float, min_value:float, max_value:float, ticks:list
 
     # Create a figure with a single AnnularWedge glyph
     p = figure(plot_width=400, plot_height=400, x_range=Range1d(-1.5, 1.5), y_range=Range1d(-1.5, 1.5))
-    p.annular_wedge(0, 0, 1, start_angle, end_angle, color='lightgray')
+    p.annular_wedge(0, 0, 1, color='lightgray')
 
     # Add a Wedge glyph for the needle
     p.wedge(0, 0, 1, start_angle, needle_angle, color='black')
