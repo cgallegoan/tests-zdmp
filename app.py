@@ -1,20 +1,10 @@
 #!/usr/bin/env python
 import pandas as pd
 from bokeh.plotting import figure, curdoc
-from bokeh.models import ColumnDataSource, TableColumn, DataTable, Div, FactorRange
+from bokeh.models import ColumnDataSource, TableColumn, DataTable, Div, FactorRange, HTMLTemplateFormatter
 from bokeh.models.widgets import AutocompleteInput
 from bokeh.layouts import column, row
-from bokeh.models.widgets.tables import StringFormatter, CellFormatter
 
-class ReliabilityFormatter(CellFormatter):
-    def __init__(self, source):
-        self.source = source
-
-    def __call__(self, row_index, column_index):
-        value = self.source.data[self.columns[column_index]][row_index]
-        if self.source.data['reliability'][row_index] < 0.1:
-            return f'<div style="background-color: red">{value}</div>'
-        return value
 
 import pika
 import sys
@@ -140,7 +130,8 @@ def create_datatable(src:ColumnDataSource,
     """
     Crea un DataTable con los datos de la fuente de datos   
     """
-    formatter = ReliabilityFormatter(source=src)
+
+    formatter =  HTMLTemplateFormatter(template="""<% if (reliability > 0.1) { %> <span style="color: green;"><%= value %></span> <% } else { %> <span style="color: red;"><%= value %></span> <% } %>""")
 
     columns = []
     columns.append(TableColumn(field="index", title="id", width=widthColumns, formatter = formatter))
