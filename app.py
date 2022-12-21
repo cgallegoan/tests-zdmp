@@ -90,12 +90,11 @@ def create_barshow():
     Crea el gráfico de barras inicial vacío
     """
 
-    source = ColumnDataSource(data=dict(variable=[], deviation=[]))
+    source = ColumnDataSource(data=dict(variable=[], deviation=[], raw_values=[]))
     p = figure(x_range=FactorRange(*[]), plot_height=250, title="Variables más relevantes",
-           toolbar_location=None, tools="")
+           toolbar_location=None, tools="hover", tooltips="@variable: @raw_values")
 
     p.vbar(x='variable', top='deviation', width=0.9, source=source)
-
     return p, source
 
 def update_barshow(attrname, old, new) -> None:
@@ -108,14 +107,16 @@ def update_barshow(attrname, old, new) -> None:
     raw_data = raw_datas[id_mostrar.value].iloc[0]
     #calculate the deviation of each variable
     deviations = [abs((raw_data[variable] - mean)/std) for variable, (mean, std) in mean_std]
+    
     #Which variables have the highest deviation
     variables = [(variable, deviation) for variable, deviation in sorted(zip(predictors, deviations), key=lambda x: x[1], reverse=True)][:5]
     variables, deviations = zip(*variables)
+    raw_values = [raw_data[variable] for variable in variables]
     #creates a columndatasoruce with the variables and their deviations
-    source = ColumnDataSource(data=dict(variable=variables, deviation=deviations))
+    source = ColumnDataSource(data=dict(variable=variables, deviation=deviations, raw_values=raw_values))
 
     barshow.x_range.factors = variables
-    barshow.title.text = f'Variables más relevantes de la muestra {id_mostrar.value}'
+    barshow.title.text = f'Variables que más se desvían de lo normal en la muestra: {id_mostrar.value}'
     source_bar.data.update(source.data)
 
 
@@ -133,12 +134,18 @@ def create_datatable(src:ColumnDataSource,
     columns.append(TableColumn(field="index", title="id", width=widthColumns))
     columns.append(TableColumn(field="reliability", title="reliability", width=widthColumns))
     columns.append(TableColumn(field="timestamp", title="timestamp", width=widthColumns))
-    columns.append(TableColumn(field="speed", title="speed_of_prediction", width=widthColumns))
+    columns.append(TableColumn(field="speed", title="prediction (s)", width=widthColumns))
+
+    def row_formatter(view, attr, old, new):
+        if view.data['reliability'][new] < 0.1:
+            return 'background-color: red'
+        return 'background-color: white'
 
     tabla = DataTable(sortable = True, reorderable = True, 
                 autosize_mode='none', source=src,
                 columns=columns, index_position = None, 
-                width = width, height = height)
+                width = width, height = height,
+                row_formatter=row_formatter)
 
     return tabla
     
