@@ -131,7 +131,7 @@ def create_datatable(src:ColumnDataSource,
     Crea un DataTable con los datos de la fuente de datos   
     """
 
-    formatter =  HTMLTemplateFormatter(template="""<% if (reliability > 0.1) { %> <span style="color: green;"><%= value %></span> <% } else { %> <span style="color: red;"><%= value %></span> <% } %>""")
+    formatter =  HTMLTemplateFormatter(template="""<% if (reliability > 0.1) { %> <div style="background-color: green;"><%= value %></div> <% } else { %> <div style="background-color: red;"><%= value %></div> <% } %>""")
 
     columns = []
     columns.append(TableColumn(field="index", title="id", width=widthColumns, formatter = formatter))
