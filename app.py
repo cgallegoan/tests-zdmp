@@ -171,6 +171,6 @@ tabla = create_datatable(ColumnDataSource(datos))
 barshow, source_bar = create_barshow()
 id_mostrar.on_change('value', update_barshow)
     
-curdoc().add_root(row(column(Div(text="""<h1>Resultados en Streaming</h1>""", width=500), tabla, width=500), column(id_mostrar, barshow, risk, width=500)))
+curdoc().add_root(row(column(Div(text="""<h1>Resultados en Streaming</h1>""", width=500), tabla, width=500), column(id_mostrar, barshow, width=500)))
 curdoc().title = "Aplicación ZDMP"
 curdoc().add_periodic_callback(update, 1000 * 15)
