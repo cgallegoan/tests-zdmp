@@ -4,7 +4,6 @@ from bokeh.plotting import figure, curdoc
 from bokeh.models import ColumnDataSource, TableColumn, DataTable, Div, FactorRange, HTMLTemplateFormatter
 from bokeh.models.widgets import AutocompleteInput
 from bokeh.layouts import column, row
-from bokeh.models import LinearAxis, Range1d, FixedTicker
 
 
 import pika
@@ -99,34 +98,6 @@ def create_barshow():
     p.vbar(x='variable', top='deviation', width=0.9, source=source)
     return p, source
 
-def create_speedometer(value:float, min_value:float, max_value:float, ticks:list):
-    """
-    Creates a speedometer gauge chart
-    """
-    # Calculate the angles for the circular gauge and the needle
-    start_angle = -90
-    end_angle = 90
-    gauge_angle = end_angle - start_angle
-    needle_angle = start_angle + gauge_angle * (value - min_value) / (max_value - min_value)
-
-    # Create a figure with a single AnnularWedge glyph
-    p = figure(plot_width=400, plot_height=400, x_range=Range1d(-1.5, 1.5), y_range=Range1d(-1.5, 1.5))
-    p.annular_wedge(0, 0, 1, color='lightgray')
-
-    # Add a Wedge glyph for the needle
-    p.wedge(0, 0, 1, start_angle, needle_angle, color='black')
-
-    # Set the axis options
-    p.xaxis.visible = False
-    p.yaxis.visible = False
-    p.xgrid.grid_line_color = None
-    p.ygrid.grid_line_color = None
-
-    # Add a LinearAxis for the ticks
-    p.add_layout(LinearAxis(ticker=FixedTicker(ticks=ticks), location="circular"), 'below')
-
-    return p
-
 def update_barshow(attrname, old, new) -> None:
 
     """
@@ -198,7 +169,6 @@ def update():
 
 tabla = create_datatable(ColumnDataSource(datos))
 barshow, source_bar = create_barshow()
-risk = create_speedometer(0, 0, 1, [0, 0.25, 0.5, 0.75, 1])
 id_mostrar.on_change('value', update_barshow)
     
 curdoc().add_root(row(column(Div(text="""<h1>Resultados en Streaming</h1>""", width=500), tabla, width=500), column(id_mostrar, barshow, risk, width=500)))
