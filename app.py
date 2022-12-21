@@ -122,7 +122,6 @@ def update_barshow(attrname, old, new) -> None:
     
     reliability = datos[datos['index']==id_mostrar.value]['reliability'].values[0]
     # Update the needle angle of the speedometer
-    risk.wedge.needle_angle = -90 + 180 * reliability
 
 
 
